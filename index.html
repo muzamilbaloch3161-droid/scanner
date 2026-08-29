@@ -1,73 +1,59 @@
-function scanCard() {
+function enhanceCard() {
 
-    if (!originalImage) {
-
-        alert("Pehle ID Card ki image upload karein.");
-
+    if (!previewImage.src) {
+        alert("Pehle ID Card scan karein.");
         return;
     }
 
-    statusBox.innerText =
-        "🔍 ID Card detect ho raha hai...";
-
-    if (typeof cv === "undefined") {
-
-        statusBox.innerText =
-            "⏳ OpenCV load ho raha hai...";
-
-        setTimeout(scanCard, 1000);
-
-        return;
-    }
+    statusBox.innerText = "✨ Image enhance ho rahi hai...";
 
     const img = new Image();
 
     img.onload = function () {
 
-        const canvas =
-            document.createElement("canvas");
+        const canvas = document.createElement("canvas");
 
         canvas.width = img.width;
         canvas.height = img.height;
 
-        const ctx =
-            canvas.getContext("2d");
+        const ctx = canvas.getContext("2d");
 
-        ctx.drawImage(
-            img,
+        ctx.drawImage(img, 0, 0);
+
+        let imageData = ctx.getImageData(
             0,
-            0
+            0,
+            canvas.width,
+            canvas.height
         );
 
-        try {
+        let data = imageData.data;
 
-            const result =
-                autoCropIDCard(canvas);
+        // Contrast + brightness
+        const contrast = 1.20;
+        const brightness = 8;
 
-            if (result) {
+        for (let i = 0; i < data.length; i += 4) {
 
-                previewImage.src = result;
+            data[i] =
+                ((data[i] - 128) * contrast) + 128 + brightness;
 
-                statusBox.innerText =
-                    "✅ ID Card Auto Crop + Straight successfully!";
+            data[i + 1] =
+                ((data[i + 1] - 128) * contrast) + 128 + brightness;
 
-            } else {
-
-                statusBox.innerText =
-                    "⚠️ ID Card detect nahi ho saka. Clear photo upload karein.";
-
-            }
-
-        } catch (error) {
-
-            console.error(error);
-
-            statusBox.innerText =
-                "❌ Scanning error.";
-
+            data[i + 2] =
+                ((data[i + 2] - 128) * contrast) + 128 + brightness;
         }
+
+        ctx.putImageData(imageData, 0, 0);
+
+        previewImage.src =
+            canvas.toDataURL("image/jpeg", 0.95);
+
+        statusBox.innerText =
+            "✅ ID Card Enhanced Successfully!";
 
     };
 
-    img.src = originalImage;
+    img.src = previewImage.src;
 }
