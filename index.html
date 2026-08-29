@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ID Card Scanner</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f3f6;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #111827;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 28px;
+        }
+
+        header p {
+            margin-top: 7px;
+            color: #cbd5e1;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .scanner-box {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.10);
+            text-align: center;
+        }
+
+        .preview {
+            width: 100%;
+            min-height: 350px;
+            border: 2px dashed #9ca3af;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: #f9fafb;
+            margin-bottom: 20px;
+        }
+
+        .preview img {
+            max-width: 100%;
+            max-height: 500px;
+            display: none;
+        }
+
+        .placeholder {
+            color: #6b7280;
+            font-size: 18px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        button,
+        .upload-label {
+            border: none;
+            padding: 13px 22px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            color: white;
+            background: #2563eb;
+            transition: 0.2s;
+        }
+
+        button:hover,
+        .upload-label:hover {
+            opacity: 0.85;
+        }
+
+        .upload-label {
+            display: inline-block;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .scan-btn {
+            background: #059669;
+        }
+
+        .enhance-btn {
+            background: #7c3aed;
+        }
+
+        .save-btn {
+            background: #dc2626;
+        }
+
+        .reset-btn {
+            background: #4b5563;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        @media(max-width: 600px) {
+            header h1 {
+                font-size: 22px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .scanner-box {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>🪪 ID Card Scanner</h1>
+    <p>Auto Crop • Adjust • Enhance • Save</p>
+</header>
+
+<div class="container">
+
+    <div class="scanner-box">
+
+        <div class="preview">
+
+            <div class="placeholder" id="placeholder">
+                ID Card Image یہاں دکھائی جائے گی
+            </div>
+
+            <img id="previewImage" alt="ID Card Preview">
+
+        </div>
+
+        <div class="buttons">
+
+            <label for="fileInput" class="upload-label">
+                📁 Upload ID Card
+            </label>
+
+            <input
+                type="file"
+                id="fileInput"
+                accept="image/*"
+            >
+
+            <button class="scan-btn" onclick="scanCard()">
+                🔍 Auto Scan
+            </button>
+
+            <button class="enhance-btn" onclick="enhanceCard()">
+                ✨ Enhance
+            </button>
+
+            <button class="save-btn" onclick="saveCard()">
+                💾 Save
+            </button>
+
+            <button class="reset-btn" onclick="resetScanner()">
+                🔄 Reset
+            </button>
+
+        </div>
+
+        <div class="status" id="status">
+            Ready — ID Card upload karein.
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const fileInput = document.getElementById("fileInput");
+const previewImage = document.getElementById("previewImage");
+const placeholder = document.getElementById("placeholder");
+const statusBox = document.getElementById("status");
+
+let originalImage = null;
+
+fileInput.addEventListener("change", function () {
+
+    const file = this.files[0];
+
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function (event) {
+
+        previewImage.src = event.target.result;
+
+        previewImage.style.display = "block";
+        placeholder.style.display = "none";
+
+        originalImage = event.target.result;
+
+        statusBox.innerText =
+            "ID Card upload ho gaya. Ab Auto Scan par click karein.";
+
+    };
+
+    reader.readAsDataURL(file);
+
+});
+
+
+function scanCard() {
+
+    if (!originalImage) {
+
+        alert("Pehle ID Card ki image upload karein.");
+
+        return;
+    }
+
+    statusBox.innerText =
+        "🔍 ID Card detect kiya ja raha hai...";
+
+    /*
+       STEP 4 mein yahan OpenCV.js ka
+       Auto Crop + Perspective Correction
+       system add karenge.
+    */
+
+    setTimeout(function () {
+
+        statusBox.innerText =
+            "✅ Scanner ready — Auto Crop system next step mein add hoga.";
+
+    }, 1000);
+
+}
+
+
+function enhanceCard() {
+
+    if (!originalImage) {
+
+        alert("Pehle ID Card upload karein.");
+
+        return;
+    }
+
+    statusBox.innerText =
+        "✨ Image Enhancement next step mein add hoga.";
+
+}
+
+
+function saveCard() {
+
+    if (!previewImage.src || previewImage.src === "") {
+
+        alert("Pehle ID Card upload karein.");
+
+        return;
+    }
+
+    const link = document.createElement("a");
+
+    link.href = previewImage.src;
+
+    link.download = "ID-Card-Scan.jpg";
+
+    link.click();
+
+    statusBox.innerText =
+        "💾 ID Card save ho gaya.";
+
+}
+
+
+function resetScanner() {
+
+    previewImage.src = "";
+
+    previewImage.style.display = "none";
+
+    placeholder.style.display = "block";
+
+    fileInput.value = "";
+
+    originalImage = null;
+
+    statusBox.innerText =
+        "Ready — ID Card upload karein.";
+
+}
+
+</script>
+
+</body>
+</html>
